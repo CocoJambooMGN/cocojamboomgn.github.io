@@ -1,12 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GitHub Page</title>
+    <title>Данные из Google Sheets</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My GitHub Page!</h1>
-    <p>This is a sample page hosted on GitHub Pages.</p>
+    <h1>Данные из Google Sheets</h1>
+    <table id="data-table">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Настройки для доступа к Google Sheets API
+        const sheetId = '1L6qVYflXjS6KG7ZOOPcpmP1859AJQbZlZVMqA9Pmp7o';
+        const apiKey = AIzaSyCyuOE6OvKPYaChC4TfJsBa-9E6ro1_rwI;  // Замените на ваш API ключ
+        const range = 'Sheet1!A1:O717';  // Укажите диапазон данных
+
+        // Функция для загрузки данных с Google Sheets API
+        async function loadData() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            // Проверка наличия данных
+            if (data.values) {
+                const table = document.getElementById('data-table');
+                const header = document.querySelector('#data-table thead');
+                const body = document.querySelector('#data-table tbody');
+
+                // Добавляем заголовки
+                header.innerHTML = '<tr>' + data.values[0].map(cell => `<th>${cell}</th>`).join('') + '</tr>';
+
+                // Добавляем строки данных
+                for (let i = 1; i < data.values.length; i++) {
+                    const row = '<tr>' + data.values[i].map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+                    body.innerHTML += row;
+                }
+            } else {
+                document.body.innerHTML = '<p>Ошибка: данные не найдены.</p>';
+            }
+        }
+
+        loadData();
+    </script>
 </body>
 </html>
